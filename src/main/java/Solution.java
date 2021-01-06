@@ -496,6 +496,505 @@ public class Solution {
 // 		return true;
 	}
 
+	//===========28==============
+	public int strStr(String haystack, String needle) {
+		if (needle == null || needle.length() == 0)
+			return 0;
+
+		char[] haystacks = haystack.toCharArray();
+		char[] needles = needle.toCharArray();
+		for (int i = 0; i< haystacks.length; i++) {
+			if (haystacks[i] == needles[0]) {
+				for (int j = 0; j < needles.length && (i + j) < haystacks.length; j++) {
+					if (haystacks[i + j] != needles[j]) {
+						break;
+					}
+					if (j == needles.length - 1) {
+						return i;
+					}
+				}
+			}
+		}
+		return -1;
+	}
+
+	//===============326=========
+	public boolean isPowerOfThree(int n) {
+//         if (n < 1) return false;
+
+//         while (n % 3 == 0) {
+//             n /= 3;
+//         }
+
+//         return n == 1;
+
+		return n > 0 && 1162261467 % n == 0;
+	}
+
+	//============1491==============
+	public double average(int[] salary) {
+		if (salary == null || salary.length <= 0) return 0;
+		int total = 0;
+		if (salary.length < 3) {
+			for (int sal : salary) {
+				total += sal;
+			}
+			return total / salary.length;
+		}
+		Arrays.sort(salary);
+		for (int i = 1; i < salary.length - 1; i++) {
+			total += salary[i];
+		}
+		return (double)total / (salary.length - 2);
+	}
+
+	//===============697=========
+	public int findShortestSubArray(int[] nums) {
+		Map<Integer, Integer> left = new HashMap<Integer, Integer>(),
+				right = new HashMap<Integer, Integer>(),
+				count = new HashMap<Integer, Integer>();
+
+		for (int i = 0; i < nums.length; i++) {
+			if (left.get(nums[i]) == null) left.put(nums[i], i);
+			right.put(nums[i], i);
+			count.put(nums[i], count.getOrDefault(nums[i], 0) + 1);
+		}
+
+		int degree = Collections.max(count.values());
+		int destence = nums.length;
+		for (int i : count.keySet()) {
+			if (count.get(i) == degree) {
+				destence = Math.min(destence, right.get(i) - left.get(i) + 1);
+			}
+		}
+		return destence;
+	}
+
+	//================561=========
+	public int arrayPairSum(int[] nums) {
+		Arrays.sort(nums);
+		int sum = 0;
+		for (int i = 0; i < nums.length; i += 2) {
+			sum += nums[i];
+		}
+		return sum;
+	}
+
+	//==========203=============
+	public ListNode removeElements(ListNode head, int val) {
+		ListNode result = new ListNode(0);
+		result.next = head;
+		ListNode moving = result;
+		while (moving.next != null) {
+			if (moving.next.val == val) {
+				moving.next = moving.next.next;
+			} else {
+				moving = moving.next;
+			}
+		}
+		return result.next;
+	}
+
+	//=================234=============
+	public boolean isPalindrome(ListNode head) {
+		if (head == null || head.next == null) return true;
+
+		ListNode slow = head;
+		ListNode fast = head;
+
+		while (fast != null && fast.next != null) {
+			fast = fast.next.next;
+			slow = slow.next;
+		}
+
+		ListNode prev = null;
+		while (slow != null) {
+			ListNode temp = slow.next;
+			slow.next = prev;
+			prev = slow;
+			slow = temp;
+		}
+
+		while (head != null && prev != null) {
+			if (head.val != prev.val)
+				return false;
+			head = head.next;
+			prev = prev.next;
+		}
+		return true;
+	}
+
+	//===========682===========
+	public int calPoints(String[] ops) {
+		Stack<Integer> score = new Stack<Integer>();
+
+		for (int i = 0; i < ops.length; i++) {
+			if ("C".equals(ops[i])) {
+				score.pop();
+			} else if ("D".equals(ops[i])) {
+				score.push(score.peek() * 2);
+			} else if ("+".equals(ops[i])) {
+				int last = score.pop();
+				int newScore = last + score.peek();
+				score.push(last);
+				score.push(newScore);
+			} else {
+				score.push(Integer.valueOf(ops[i]));
+			}
+		}
+
+		int sum = 0;
+		while (!score.isEmpty()) {
+			sum += score.pop();
+		}
+
+		return sum;
+	}
+
+	//========674============
+	public int findLengthOfLCIS(int[] nums) {
+		int result = 0;
+		int anchor = 0;
+		for (int i = 0; i < nums.length; i++) {
+			if (i > 0 && nums[i] <= nums[i - 1]) anchor = i;
+			result = Math.max(result, i - anchor +1);
+		}
+		return result;
+	}
+
+	//=============1005==========
+	public int largestSumAfterKNegations(int[] A, int K) {
+		if (A == null || A.length <= 0) return 0;
+
+		while (K > 0) {
+			int minIndex = 0;
+			for (int i = 0; i < A.length; i++) {
+				if (A[minIndex] > A[i]) minIndex = i;
+			}
+
+			A[minIndex] = -A[minIndex];
+
+			K--;
+		}
+
+		int result = 0;
+		for (int a : A) {
+			result += a;
+		}
+		return result;
+	}
+
+
+	//====1208=========
+	public int equalSubstring(String s, String t, int maxCost) {
+		char[] sChar = s.toCharArray();
+		char[] tChar = t.toCharArray();
+		int[] cost = new int[sChar.length];
+
+		for (int i = 0; i < sChar.length; i++) {
+			cost[i] += Math.abs(sChar[i] - tChar[i]);
+		}
+
+		int sum = 0;
+		int max_length = Integer.MIN_VALUE;
+		int start = 0;
+		int end;
+		for (end = 0; end < cost.length; end++) {
+			sum += cost[end];
+			if (sum <= maxCost) {
+				max_length = Math.max(max_length, end - start + 1);
+			} else {
+				while (sum > maxCost) {
+					sum -= cost[start++];
+				}
+				max_length = Math.max(max_length, end - start + 1);
+			}
+		}
+		return max_length == Integer.MIN_VALUE ? 0 : max_length;
+	}
+
+	//===========1561============
+	public int maxCoins(int[] piles) {
+		Arrays.sort(piles);
+		int times = piles.length / 3;
+		int result = 0;
+		int index = piles.length - 2;
+		while (times > 0) {
+			result += piles[index];
+			index = index - 2;
+			times--;
+		}
+
+		return result;
+	}
+
+	//======735===========
+	public int[] asteroidCollision(int[] asteroids) {
+		Stack<Integer> asts = new Stack();
+
+		for (int asteroid : asteroids) {
+			next: {
+				while (!asts.isEmpty() && asteroid < 0 && asts.peek() > 0) {
+					if (asts.peek() < -asteroid) {
+						asts.pop();
+						continue;
+					} else if (asts.peek() == -asteroid) {
+						asts.pop();
+					}
+					break next;
+				}
+				asts.push(asteroid);
+			}
+		}
+
+		int[] result = new int[asts.size()];
+		for (int i = asts.size() - 1; i >= 0 ; i--) {
+			result[i] = asts.pop();
+		}
+		return result;
+	}
+
+	//================1144===========
+	public int movesToMakeZigzag(int[] nums) {
+		int[] numsClone = nums.clone();
+		int increaseSum = 0;
+		boolean increase = true;
+		for (int i = 0; i < nums.length - 1; i++) {
+			if (increase && nums[i] < nums[i + 1]) {
+				increase = false;
+				continue;
+			}
+			if (!increase && nums[i] > nums[i + 1]) {
+				increase = true;
+				continue;
+			}
+
+			if (increase) {
+				increaseSum += nums[i] - nums[i + 1] + 1;
+				nums[i] = nums[i + 1] - 1;
+			} else {
+				increaseSum += nums[i + 1] - nums[i] + 1;
+				nums[i + 1] = nums[i] - 1;
+			}
+			increase = !increase;
+		}
+
+		increase = false;
+		int decreaseSum = 0;
+		for (int i = 0; i < numsClone.length - 1; i++) {
+			if (increase && numsClone[i] < numsClone[i + 1]) {
+				increase = false;
+				continue;
+			}
+			if (!increase && numsClone[i] > numsClone[i + 1]) {
+				increase = true;
+				continue;
+			}
+
+			if (increase) {
+				decreaseSum += numsClone[i] - numsClone[i + 1] + 1;
+				nums[i] = nums[i + 1] - 1;
+			} else {
+				decreaseSum += numsClone[i + 1] - numsClone[i] + 1;
+				numsClone[i + 1] = numsClone[i] - 1;
+			}
+			increase = !increase;
+		}
+
+		return Math.min(increaseSum, decreaseSum);
+	}
+
+	//============290=========
+	public boolean wordPattern(String pattern, String s) {
+		String[] words = s.split(" ");
+		if (pattern.length() != words.length) return false;
+		Map<Character, String> c = new HashMap<Character, String>();
+		Map<String, Character> w = new HashMap<String, Character>();
+
+		for (int i = 0; i < words.length; i++) {
+			char p = pattern.charAt(i);
+			String word = words[i];
+			if (!c.containsKey(pattern.charAt(i)) && !w.containsKey(words[i])) {
+				c.put(p, word);
+				w.put(word, p);
+				continue;
+			}
+
+			if (c.containsKey(pattern.charAt(i))) {
+				if (!w.containsKey(words[i]))
+					return false;
+				if (!c.get(pattern.charAt(i)).equals(word))
+					return false;
+			}
+
+			if (w.containsKey(words[i])) {
+				if (!c.containsKey(pattern.charAt(i)))
+					return false;
+				if (!c.get(pattern.charAt(i)).equals(word))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean canJump(int[] A) {
+		// write your code here
+		if (A.length <= 1) return true;
+
+		boolean[] f = new boolean[A.length];
+
+		f[0] = true;
+		for (int i = 1; i < A.length; i++) {
+			f[i] = false;
+			for (int j = 0; j < i; j++) {
+				if (f[j] && (j + A[j] >= i)) {
+					f[i] = true;
+					break;
+				}
+			}
+		}
+
+		return f[A.length - 1];
+	}
+
+	public int maxProductSubarray(int[] nums) {
+		if (nums.length == 1) return nums[0];
+
+		int[] f = new int[nums.length];
+		f[0] = nums[0];
+		for (int i = 0; i < nums.length; i++) {
+			for (int j = i + 1; j < nums.length; j++) {
+				if (Math.abs(f[i]) < Math.abs(f[i] * f[j]))
+					f[i] = f[i] * f[j];
+			}
+		}
+
+		for (int i = nums.length - 1; i >= 0; i--) {
+			if (f[i] != Integer.MIN_VALUE && f[i] >= 0)
+				return f[i];
+		}
+		return Integer.MIN_VALUE;
+
+	}
+
+	public int minimumSize(int[] nums, int s) {
+		// write your code here
+		int left = 0;
+		int s1 = 0;
+		int s2 = 0;
+		int min_length = Integer.MAX_VALUE;
+
+		for (int right = 0; right < nums.length; right++) {
+			s2 += nums[right];
+			if (s2 >= s) {
+				while (s2 - s1 >= s) {
+					s1 += nums[left++];
+				}
+				s1 -= nums[--left];
+				min_length = Math.min(min_length, right - left + 1);
+			}
+		}
+
+		return min_length == Integer.MAX_VALUE ? -1 : min_length;
+	}
+
+
+	public int nodeDistance(TreeNode root, TreeNode node) {
+		if (node == null) return -1;
+		HashMap<TreeNode, Integer> distance = new HashMap();
+		Queue<TreeNode> q = new ArrayDeque<>();
+		q.offer(root);
+		distance.put(root, 0);
+
+		while (!q.isEmpty()) {
+			TreeNode nodeTemp = q.poll();
+			if (nodeTemp.val == node.val) {
+				return distance.get(nodeTemp);
+			}
+			if (nodeTemp.left != null) {
+				q.offer(nodeTemp.left);
+				distance.put(nodeTemp.left, distance.get(nodeTemp) + 1);
+			}
+			if (nodeTemp.right != null) {
+				q.offer(nodeTemp.left);
+				distance.put(nodeTemp.right, distance.get(nodeTemp) + 1);
+			}
+		}
+		return 0;
+	}
+
+	public int lengthOfLongestSubstring(String s) {
+		// write your code here
+
+		int right = 1;
+		char[] sc = s.toCharArray();
+		Set<Character> cs = new HashSet<Character>();
+
+		int max_length = 0;
+
+		for (int left = 0; left < sc.length; left++) {
+			cs.add(sc[left]);
+			if (left > 0) cs.remove(sc[left - 1]);
+			while (right < sc.length && !cs.contains(sc[right])) {
+				cs.add(sc[right]);
+				right++;
+			}
+			max_length = Math.max(max_length, right - left);
+		}
+		return max_length;
+	}
+
+
+	public String minWindow(String source , String target) {
+		if (source.length() == 0) return "";
+
+		// write your code here
+		char[] s = source.toCharArray();
+		char[] t = target.toCharArray();
+
+		int[] ss = new int[256]; // store the real time chars
+		int[] st = new int[256]; // store the target chars
+
+		int K = 0; // store the number of target chars
+		int C = 0; // store the meet the number of real time chars
+
+		//init st
+		for (int i = 0; i < t.length; i++) {
+			st[t[i]]++;
+			if (st[t[i]] == 1) K++;
+		}
+		int left = 0;
+		int right = 1;
+		int finalLeft = -1;
+		int finalRight = -1;
+		ss[s[left]]++;
+		if (ss[s[left]] == st[s[left]]) C++;
+		for (left = 0; left < s.length; left++) {
+			while (right < s.length && C < K) {
+				ss[s[right]]++;
+				if (ss[s[right]] == st[s[right]]) {
+					C++;
+				}
+				right++;
+			}
+			if (C == K) {
+				if (finalLeft == -1 || (right - left < finalRight - finalLeft)) {
+					finalLeft = left;
+					finalRight = right;
+				}
+			}
+
+			ss[s[left]]--;
+			if (ss[s[left]] == st[s[left]] - 1) {
+				C--;
+			}
+		}
+
+		return finalLeft == -1 ? "" : source.substring(finalLeft, finalRight);
+
+	}
+
+
 	public static void main(String[] args) {
 
 		// ListNode a1 = new ListNode(1);
@@ -563,7 +1062,9 @@ public class Solution {
 
 		//new Solution().findWords(new char[][]{{'o', 'a', 'a', 'n'}, {'e', 't', 'a', 'e'}, {'i', 'h', 'k', 'r'}, {'i', 'f', 'l', 'v'}}, new String[]{"oath", "pea", "eat", "rain"});
 
-		System.out.println(new Solution().isPalindrome(10));
+//		System.out.println(new Solution().isPalindrome(10));
+		System.out.println(new Solution().lengthOfLongestSubstring("abcabcbb"));
+		System.out.println(new Solution().minWindow("aaaaaaaaaaaabbbbbcdd", "abcdd"));
 	}
 
 	// ==========24============
