@@ -995,6 +995,208 @@ public class Solution {
 	}
 
 
+	public int lengthOfLongestSubstringKDistinct(String ss, int k) {
+		// write your code here
+		if ("".equals(ss)) return 0;
+		if (k < 1) return k;
+		if (ss.length() <= k) return ss.length();
+
+		char[] s = ss.toCharArray();
+		int[] window = new int[256];
+
+		int left = 0;
+		int right = 0;
+
+		int finalLeft = -1;
+		int finalRight = -1;
+
+		window[s[left]]++;
+		int c = 1;
+		for (; left < s.length; left++) {
+			while (right < s.length && c <= k) {
+				right++;
+				if (right >= s.length) break;
+				window[s[right]]++;
+				if (window[s[right]] == 1) c++;
+			}
+
+			if (left == 0 && right >= s.length) return ss.length();
+
+			if (c - 1 == k|| c == k) {
+				if (finalLeft == -1 || finalRight - finalLeft < ( right - left)) {
+					finalLeft = left;
+					finalRight = right;
+				}
+			}
+			window[s[left]]--;
+			if (window[s[left]] == 0) c--;
+		}
+
+		return finalRight - finalLeft;
+	}
+
+	public int kthSmallest(int k, int[] nums) {
+		// write your code here
+		int pivotIndex = partitioning(nums, 0, nums.length);
+		if (k == pivotIndex + 1) {
+			return nums[pivotIndex];
+		} else if (k < pivotIndex + 1) {
+			return kthSmallest(k, Arrays.copyOfRange(nums, 0,  pivotIndex));
+		} else {
+			return kthSmallest(k - pivotIndex - 1, Arrays.copyOfRange(nums, pivotIndex + 1,  nums.length));
+		}
+	}
+
+	int partitioning (int[] nums, int start, int end) {
+		int pivot = nums[start];
+		int i = start;
+		int j = end;
+		while (i < j) {
+			while (i < j && pivot <= nums[--j]);
+			if (i < j) {
+				nums[i] = nums[j];
+			}
+			while (i < j && pivot >= nums[++i]);
+			if (i < j) {
+				nums[j] = nums[i];
+			}
+		}
+
+		nums[j] = pivot;
+		return j;
+	}
+
+
+	public int KthInArrays(int[][] arrays, int k) {
+		// write your code here
+		PriorityQueue<Integer> pq = new PriorityQueue<Integer>(k, Collections.reverseOrder());
+		for (int i = 0; i< arrays.length; i++) {
+			for (int j = 0; j< arrays[i].length; j++) {
+				pq.offer(arrays[i][j]);
+			}
+		}
+
+		int result = 0;
+		while (k-- > 0) {
+			result = pq.poll();
+		}
+
+		return result;
+	}
+
+	public int kthSmallest(int[][] matrix, int k) {
+		// write your code here
+		// PriorityQueue<Integer> pq = new PriorityQueue<Integer>(k);
+
+		// for (int i = 0; i < matrix.length; i++) {
+		//     for (int j = 0; j < matrix[i].length; j++) {
+		//         pq.offer(matrix[i][j]);
+		//     }
+		// }
+
+		// int result = 0;
+		// while (k-- > 0) {
+		//     result = pq.poll();
+		// }
+		// return result;
+
+		PriorityQueue<Integer> pq = new PriorityQueue<Integer>(k);
+
+		int m = matrix.length;
+		int n = matrix[0].length;
+		int current_x = 0;
+		int current_y = 0;
+		boolean[][] used = new boolean[m][n];
+
+		for (int i = 0; i < k - 1; i++) {
+
+			int down = Integer.MAX_VALUE;
+			int next_x = current_x + 1;
+			if (next_x < m && !used[next_x][current_y]) {
+				down = matrix[next_x][current_y];
+				used[next_x][current_y] = true;
+			}
+
+			int right = Integer.MAX_VALUE;
+			int next_y = current_y + 1;
+			if ( next_y < n && !used[current_x][next_y]) {
+				right = matrix[current_x][next_y];
+				used[current_x][next_y] = true;
+			}
+			if (right < down) {
+				current_y++;
+			} else {
+				current_x++;
+			}
+		}
+
+		return matrix[current_x][current_y];
+	}
+
+
+
+	class Sum {
+		int x;
+		int y;
+		int val;
+		public Sum(int x, int y, int val) {
+			this.x = x;
+			this.y = y;
+			this.val = val;
+		}
+
+	}
+	class SumComparator implements Comparator<Sum> {
+		public int compare (Sum a, Sum b) {
+			return a.val - b.val;
+		}
+	}
+	public int kthSmallestSum(int[] A, int[] B, int kk) {
+		// write your code here
+		PriorityQueue<Sum> pq = new PriorityQueue<Sum>(kk, new SumComparator());
+
+		Sum sum = new Sum(0, 0, A[0] + B[0]);
+		pq.offer(sum);
+
+		int[] dx = new int[] {1, 0};
+		int[] dy = new int[] {0, 1};
+		boolean[][] used = new boolean[A.length][B.length];
+
+
+		for (int k = 0; k < kk - 1; k++) {
+			sum = pq.poll();
+			for (int j = 0; j < 2; j++) {
+				int next_x = sum.x + dx[j];
+				int next_y = sum.y + dy[j];
+				if (next_x < A.length && next_y < B.length && !used[next_x][next_y]) {
+					pq.offer(new Sum(next_x, next_y, A[next_x] + B[next_y]));
+					used[next_x][next_y] = true;
+				}
+			}
+		}
+
+		return pq.peek().val;
+	}
+
+	public int kthSmallestSum(TreeNode root, int k) {
+		int left = countTreeNode(root.left);
+		if (k > left + 1) {
+			return kthSmallestSum(root.right, k - left - 1);
+		} else if (k < left + 1) {
+			return kthSmallestSum(root.left, k);
+		} else {
+			return root.val;
+		}
+	}
+	int countTreeNode(TreeNode root) {
+		if (root == null)
+			return 0;
+		return countTreeNode(root.left) + countTreeNode(root.right) + 1;
+	}
+
+
+
+
 	public static void main(String[] args) {
 
 		// ListNode a1 = new ListNode(1);
@@ -1065,6 +1267,43 @@ public class Solution {
 //		System.out.println(new Solution().isPalindrome(10));
 		System.out.println(new Solution().lengthOfLongestSubstring("abcabcbb"));
 		System.out.println(new Solution().minWindow("aaaaaaaaaaaabbbbbcdd", "abcdd"));
+		System.out.println(new Solution().lengthOfLongestSubstringKDistinct("igtpevzimytyukifgezynnksysssnohespcwiqpheetgjtgmxkeqqoxldqkribsrkmooiyqkpjxaxllmizwiqzribq", 17));
+		System.out.println(new Solution().kthSmallest(10, new int[] {1,2,3,4,5,6,8,9,10,7}));
+		System.out.println(new Solution().kthSmallest(new int[][] {
+				{1,3,5,7,9},
+				{2,4,6,8,10},
+				{11,13,15,17,19},
+				{12,14,16,18,20},
+				{21,22,23,24,25}}, 8));
+		System.out.println(new Solution().kthSmallestSum(new int[] {1, 7, 11}, new int[] {2, 4, 6}, 3));
+
+//		1,2,3,4,5,6,7,8,9,10,11,12
+//		1,2,2,4,7,6,7,8,9,3,11,8
+		ConnectingGraph3 connectingGraph3 = new ConnectingGraph3(12);
+		connectingGraph3.connect(3, 9);
+		connectingGraph3.connect(10, 9);
+		connectingGraph3.connect(5, 7);
+		System.out.println(connectingGraph3.query());
+		System.out.println(connectingGraph3.query());
+		System.out.println(connectingGraph3.query());
+		connectingGraph3.connect(3, 2);
+		connectingGraph3.connect(10, 11);
+		System.out.println(connectingGraph3.query());
+		connectingGraph3.connect(12, 8);
+		connectingGraph3.connect(10, 3);
+		connectingGraph3.connect(10, 12);
+		System.out.println(connectingGraph3.query());
+		connectingGraph3.connect(10, 5);
+		System.out.println(connectingGraph3.query());
+		System.out.println(connectingGraph3.query());
+		System.out.println(connectingGraph3.query());
+		System.out.println(connectingGraph3.query());
+		System.out.println(connectingGraph3.query());
+		connectingGraph3.connect(10, 8);
+		connectingGraph3.connect(12, 2);
+		System.out.println(connectingGraph3.query());
+		System.out.println(connectingGraph3.query());
+		connectingGraph3.connect(7, 6);
 	}
 
 	// ==========24============
@@ -1753,4 +1992,65 @@ class BinarySearch {
 	}
 }
 
+//=========union and find===========
+class UnionAndFind {
+	int[] father = null;
+	public int findFather(int node) {
+		if (father[node] == node)
+			return node;
+		return father[node] = findFather(father[node]);
+	}
 
+	public void union(int a, int b) {
+		int aFather = findFather(a);
+		int bFather = findFather(b);
+
+		if (father[aFather] != father[bFather])
+			father[bFather] = father[aFather];
+	}
+}
+
+
+class ConnectingGraph3 {
+	/**
+	 * @param a: An integer
+	 * @param b: An integer
+	 * @return: nothing
+	 */
+
+	int[] father;
+	int count = 0;
+	public ConnectingGraph3(int n) {
+
+		// initialize your data structure here.
+		father = new int[n+1];
+		count = n;
+		for (int i = 1; i <= n; i++) {
+			father[i] = i;
+		}
+	}
+
+	public void connect(int a, int b) {
+		// write your code here
+		int aFather = find(a);
+		int bFather = find(b);
+		if (aFather != bFather) {
+			father[aFather] = bFather;
+			count--;
+		}
+	}
+
+	public int find(int node) {
+		if (father[node] == node)
+			return node;
+		return father[node] = find(father[node]);
+	}
+
+	/**
+	 * @return: An integer
+	 */
+	public int query() {
+		// write your code here
+		return count;
+	}
+}
