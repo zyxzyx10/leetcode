@@ -23,3 +23,23 @@
 ####压缩路径查询
 ####图的问题往并查集上想
 ####集合问题往并查集上想
+
+##岛屿问题
+####二维坐标转一维坐标
+`for x`\
+`for y`\
+`x * y + y`
+####一维坐标转二维
+`for i`\
+`x = i * d / m, y = i * d / n`
+####20分钟写出Trie树
+
+
+Heap，priority queue, 要用到删除用treeset可以把复杂度降到logn
+维护一个候选集合
+sliding widonw,求第几大
+求中位数，维护两个heap，一个max一个min
+stack
+优化递归，把递归转成非递归
+保存信息
+要找左边和右边比较大的数要用mono stack
